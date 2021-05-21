@@ -1,47 +1,44 @@
-1. git rev-parse aefea
-- Ответ
-- ХЭШ          aefead2207ef7e2aa5dc81a34aedf0cad4c32545
-- Запрос
-- git show aefead2207ef7e2aa5dc81a34aedf0cad4c32545
-- Ответ
-- комметарий     Update CHANGELOG.md
+1. Какие ресурсы выделяет по умолчанию Vagrant ВМ?
+- 1 ядро
+- 1024 ОП
+- Видеопамять 8 мб
+- Винт 64 гб
 
-- Можно сразу git show aefea
+2. Как добавить ОП и ЦП?
+- config.vm.provider "virtualbox" do |v|
+- v.memory = 1024
+- v.cpus = 2
 
-2. git show 85024d3
-- Коммит 85024d3100126de36331c6982bfaac02cdab9e76
-- tag: v0.12.23
-- как вариант
-- git tag --points-at 85024d3
+3. Какой переменной можно задать длину журнала history
+- HISTFILESIZE
+- В какой строке указывается в man
+-  The  file  named  by  the  value of HISTFILE is truncated, if necessary, to contain no more than the number of
+-  lines specified by the value of HISTFILESIZE
 
-3. git log --no-walk b8d720^@
-- или тоже самое git show b8d720^1
--	       git show b8d720^1	
+4. Что делает директива ignoreboth в bash?
+- Она объединяет действие 2- х директив ignorespace и ignoredups
+- Указывает не записывать команду, которая начинается с пробела, либо команду, которая дублирует предыдущую
 
--	2 родителя
-- 9ea88f22fc6269854151c571162c5bcf958bee2b
-- 56cd7859e05c36c06b56d013b55a252d0bb7e158
+5. В каких сценариях использования применимы скобки {} и на какой строчке man bash это описано?
+- Применимо в случае сокращения записи c применением шаблона. Не знаю как объяснить по русски. Проще показать пример:
+- ls {[1-3],[ac]}*  
+- 1abc 2abc 3abc abc1 abc2 abc3   - результат. В данном случе ищутся все файлы соответствующие шафлону в фигурных скобках.
+- Почитать можно в разделе Brace Expansion
 
-4. git log --pretty=oneline v0.12.23...v0.12.24
-- 33ff1c03bb960b332be3af2e333462dde88b279e (tag: v0.12.24) v0.12.24
-- b14b74c4939dcab573326f4e3ee2a62e23e12f89 [Website] vmc provider links
-- 3f235065b9347a758efadc92295b540ee0a5e26e Update CHANGELOG.md
-- 6ae64e247b332925b872447e9ce869657281c2bf registry: Fix panic when server is unreachable
-- 5c619ca1baf2e21a155fcdb4c264cc9e24a2a353 website: Remove links to the getting started guide's old location
-- 06275647e2b53d97d4f0a19a0fec11f6d69820b5 Update CHANGELOG.md
-- d5f9411f5108260320064349b757f55c09bc4b80 command: Fix bug when using terraform login on Windows
-- 4b6d06cc5dcb78af637bbb19c198faff37a066ed Update CHANGELOG.md
-- dd01a35078f040ca984cdd349f18d0b67e486c35 Update CHANGELOG.md
-- 225466bc3e5f35baa5d07197bbc079345b77525e Cleanup after v0.12.23 release
+6. Основываясь на предыдущем вопросе, как создать однократным вызовом touch 100000 файлов? А получилось ли создать 300000?
+- touch proba{0..100000}
+- 300000 не создаст Argument list too long 
 
-5. git log -S"func providerSource"
-- Изменения происходят в 2-х хэшах. Оставил оба, т.к функцию по сути переписали.
-- 5af1e6234ab6da412fb8637393c5a17a1b293663
-- 8c928e835
+7. В man bash поищите по /\[\[. Что делает конструкция [[ -d /tmp ]]
+- Данная констркция служит для проверки условий и возвращает результат 0 или 1. В указанном примере с ключём -d  проверяем наличие директории tmp.
 
-6. git log -L :globalPluginDirs:plugins.go --oneline
-- 41ab0aef7
-- 52dbf9483
-- 78b122055
+8. Получить при команде type -a bash список ниже
+- bash is /tmp/new_path_directory/bash
+- bash is /usr/local/bin/bash
+- bash is /bin/bash
+- Получил так: 1. Создал /tmp/new_path_directory, скопировал туда необходимый файл из  /bin/bash, далее коммандой PATH="/tmp/new_path_directory:$PATH" добавил необходимый путь.
 
-7. Martin Atkins
+9. Чем отличается планирование команд с помощью batch и at?
+- Команда at позволяет выполнять одразовое задание в заданное время
+- Команда batch позволяет выполнять одноразовое задание в случае если значение средней нагрузки системы падает меньше определённого значения. По умолчанию 1,5
+
