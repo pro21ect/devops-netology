@@ -11,5 +11,13 @@
 - обнуляю дескриптор
 - cat /proc/2927/fd/3 > /dev/null
 
-4. Зомби процессы занимают ресурсы
+4. Зомби процессы не занимают ресурсы перечисленные в вопросе. Они - это запись в таблице процессов.
+
+5. Просматривал командой strace -o log.txt /usr/sbin/opensnoop-bpfcc дальше в файле поиском. 
+- /usr/lib/python3.8/lib-dynload
+- include/linux/string.h
+- include/linux/string.h
+- include/linux/string.h
+- include/uapi/linux/string.h
+
    
