@@ -18,7 +18,5 @@
 - include/linux/string.h
 - include/uapi/linux/string.h
 
-6.  
-
-
-   
+6.  Основная работа программа выполняется строкой uname({sysname="Linux", nodename="vagrant", ...}) = 0 
+-  Часть информации может быть получена по следующим адресам /proc/sys/kernel/ {ostype, hostname, osrelease, version, domainname}. 
