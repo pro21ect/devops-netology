@@ -16,8 +16,6 @@
 5. Просматривал командой strace -o log.txt /usr/sbin/opensnoop-bpfcc дальше в файле поиском. 
 - /usr/lib/python3.8/lib-dynload
 - include/linux/string.h
-- include/linux/string.h
-- include/linux/string.h
 - include/uapi/linux/string.h
 
 6.  
