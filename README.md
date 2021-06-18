@@ -64,5 +64,10 @@ vagrant reload --provision
 sudo systemctl restart netdata
 ```
 ```
-4. 
+4. Да возможно.
+sudo dmesg | grep "Hypervisor detected"
+Hypervisor detected: KVM
+```
+```
+5. 
 ```
