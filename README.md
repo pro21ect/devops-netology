@@ -1,78 +1,33 @@
 ```
-1. Качаю архив node_exporter
-- curl -LO https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-386.tar.gz
-- Распоковываю
-- tar xvf node_exporter-1.1.2.linux-386.tar.gz
-- Перехожу в созданную папку
-- Копирую исполняемый файл /usr/local/bin
-- sudo cp node_exporter /usr/local/bin
-- Создаю пользователя под node_exporter без возможности авторизации
-- sudo useradd --no-create-home --shell /bin/false node_exporter
-- Передаю права пользователю node_exporter
-- sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
-- Создаю служебный файл systemd
-- sudo nano /etc/systemd/system/node_exporter.service
-- Заполняю его
-[Unit]
-Description=Node Exporter
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-User=node_exporter
-Group=node_exporter
-Type=simple
-ExecStart=/usr/local/bin/node_exporter
-EnvironmentFile=-/etc/default/node_exporter $OPTIONS
-
-[Install]
-WantedBy=multi-user.target
-- Создаю файл /etc/default/node_exporter
-vim /etc/default/node_exporter
-- Заполняю
-OPTIONS="--collector.disable-defaults --collector.cpu --collector.meminfo --collector.filesystem --collector.netdev"
-- перезапускаю systemd
--sudo systemctl daemon-reload
-- Стартую
-sudo systemctl start node_exporter
-- Проверяю
-sudo systemctl status node_exporter
--Добавляю в автозапуск
-sudo systemctl enable node_exporter
-- Проверяю ещё
-curl http://localhost:9100/metrics
+1. sparse file -  файл, в котором последовательности нулевых байтов[1] заменены на информацию об этих последовательностях (список дыр)
+Если своими словами, то реальный размер файла будет равняться тому размеру в котором реально записана информация.
+Такое применяется например в виртуальных дисках.
 ```
 ```
-2. Метрики для ЦП
-cpu Предоставляет статистику процессора
-cpufreq Предоставляет статистику частоты процессора
-- Метрики для диска
-diskstats - Статистика ввода вывода
-filesystem - Предоставляет статистику файловой системы, такую как используемое дисковое пространство.
-- Сетевая статистика
-netstat -показывает сетевую статистику
-- ОП
-meminfo - статистика оперативной памяти
+2. Жёсткая ссылка на объект не может иметь отличные  права доступа и владельца от файла на который она указывает. По сути это синоним или второе имя файла.
 ```
 ```
-3. Метрик собирается большое кол-во. Все перечислять не имеет смысла.
-Метрики сгруппированы по группам ЦП, ОП, Дисковые, Сетевые, использование ресуросв sysmemd сервисами,
-использование ресурсов группами пользователей и пр.
-Из особенностей установки можно отметить после добавления строки из задания в  конфиг файл Vagrant необходима команда
-vagrant reload --provision
-Также после изменения конфига netdata команда
-sudo systemctl restart netdata
+3. Проделано.
+Проверить что всё норм можно командой lsblk
 ```
 ```
-4. Да возможно.
-sudo dmesg | grep "Hypervisor detected"
-Hypervisor detected: KVM
+4. Для разбиения использовал интерактивную утилиту, позволившую пошагово провести все действия.
+sudo fdisk /dev/sdb
+В итоге получил
+sdb                    8:16   0  2.5G  0 disk
+├─sdb1                 8:17   0    2G  0 part
+└─sdb2                 8:18   0  511M  0 part
 ```
 ```
-5. sysctl - утилита для упарвления параметрами ядра в реальном режиме времени
-sysctl fs.nr_open  
-Это означает максимальное количество файловых дескрипторов, которое может выделить процесс. Значение по умолчанию-1024*1024 (1048576).
-Изменить данное значение можно с помощью команды ulimit -n <желаемое значение лимита>
+5. Переношу таблицу разделов с sdb на sdc
+sfdisk -d /dev/sdb | sfdisk /dev/sdc
+Проверяю lsblk
+sdb                    8:16   0  2.5G  0 disk
+├─sdb1                 8:17   0    2G  0 part
+└─sdb2                 8:18   0  511M  0 part
+sdc                    8:32   0  2.5G  0 disk
+├─sdc1                 8:33   0    2G  0 part
+└─sdc2                 8:34   0  511M  0 part
 ```
 ```
 6. Запускаю процесс в отдельм неймспейсе
