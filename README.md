@@ -30,13 +30,17 @@ sdc                    8:32   0  2.5G  0 disk
 └─sdc2                 8:34   0  511M  0 part
 ```
 ```
-6. Запускаю процесс в отдельм неймспейсе
-unshare -f --pid --mount-proc sleep 1h
-Выясняю PID процесса в моём случае 1552
-Захожу в неймспейс
-nsenter --target 1552 --pid --mount
-Проверяю pid командой htop
-PID1 принадлежит sleep 1h
+6. Создаю Raid 1
+mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
+Проверяю
+sdb                    8:16   0  2.5G  0 disk
+├─sdb1                 8:17   0    2G  0 part
+│ └─md0                9:0    0    2G  0 raid1
+└─sdb2                 8:18   0  511M  0 part
+sdc                    8:32   0  2.5G  0 disk
+├─sdc1                 8:33   0    2G  0 part
+│ └─md0                9:0    0    2G  0 raid1
+└─sdc2                 8:34   0  511M  0 part
 ```
 ```
 7. :(){ :|:& };: - функция которая сама себя плодит в цикле. Выполнена в стандарте UUEEncode / UUEDecode. Позволяет передавать двоичный код в тестовом виде.
