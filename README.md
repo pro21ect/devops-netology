@@ -88,14 +88,15 @@ sudo pvdisplay
 ```
 ```
 9. Создаю VG
-vgcreate vg01 /dev/md0 /dev/md1
+vgcreate vg01 /dev/md0
+vgcreate vg02 /dev/md1
 Проверяю
 vgdisplay
---- Volume group ---
-  VG Name               vg01
+ --- Volume group ---
+  VG Name               vg02
   System ID
   Format                lvm2
-  Metadata Areas        2
+  Metadata Areas        1
   Metadata Sequence No  1
   VG Access             read/write
   VG Status             resizable
@@ -103,12 +104,58 @@ vgdisplay
   Cur LV                0
   Open LV               0
   Max PV                0
-  Cur PV                2
-  Act PV                2
-  VG Size               <2.99 GiB
+  Cur PV                1
+  Act PV                1
+  VG Size               1016.00 MiB
   PE Size               4.00 MiB
-  Total PE              765
+  Total PE              254
   Alloc PE / Size       0 / 0
-  Free  PE / Size       765 / <2.99 GiB
-  VG UUID               bT3bJz-BTsM-jvHE-rpBD-CawJ-MqbT-MZFG1A
+  Free  PE / Size       254 / 1016.00 MiB
+  VG UUID               4XKtR1-aG03-qZxx-iW4b-IUJH-QBOd-A5bnaF
+
+  --- Volume group ---
+  VG Name               vg01
+  System ID
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <2.00 GiB
+  PE Size               4.00 MiB
+  Total PE              511
+  Alloc PE / Size       0 / 0
+  Free  PE / Size       511 / <2.00 GiB
+  VG UUID               XtsliU-gf0j-wgpG-tyLS-DN8s-KSvu-Yw0XhX
+```
+```
+10. Создаю  LV 100Мб на RAID0
+lvcreate --name lv_test1 --size 100M vg02
+Проверяю
+lvdisplay
+ --- Logical volume ---
+  LV Path                /dev/vg02/lv_test1
+  LV Name                lv_test1
+  VG Name                vg02
+  LV UUID                AOYoeA-uDNu-X0aF-XEfk-WTEa-weuU-LkAiXG
+  LV Write Access        read/write
+  LV Creation host, time vagrant, 2021-06-27 09:42:58 +0000
+  LV Status              available
+  # open                 0
+  LV Size                100.00 MiB
+  Current LE             25
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     4096
+  Block device           253:2
+```
+```
+11. 
 ```
