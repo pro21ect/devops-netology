@@ -58,5 +58,31 @@ sdc                    8:32   0  2.5G  0 disk
   └─md1                9:1    0 1018M  0 raid0
 ```
 ```
-8. 
+8. Создаю PV
+pvcreate /dev/md0 /dev/md1
+Оцениваю результат
+sudo pvdisplay
+ "/dev/md0" is a new physical volume of "<2.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/md0
+  VG Name
+  PV Size               <2.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               zrIe8R-mYfJ-ZbCl-337y-r8rB-F4Jo-edbPFq
+
+  "/dev/md1" is a new physical volume of "1018.00 MiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/md1
+  VG Name
+  PV Size               1018.00 MiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               z8UVPQ-6Z22-XVYa-ZR0x-E6Cz-Zl2I-YTA2mk
 ```
