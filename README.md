@@ -213,5 +213,29 @@ root@vagrant:/# echo $?
 0
 ```
 ```
-16. 
+16. Для переонса необходимо чтоб физические тома были в одной одной логической группе
+Поэтому вначале удаляю логическу группу томов vg01
+vgremove vg01
+Вижу
+Volume group "vg01" successfully removed
+Затем добавляю том в vg02
+vgextend vg02 /dev/md0
+Вижу
+Volume group "vg02" successfully extended
+Затем перемещаю физические тома
+pvmove /dev/md1 /dev/md0
+Результат
+sdb                    8:16   0  2.5G  0 disk
+├─sdb1                 8:17   0    2G  0 part
+│ └─md0                9:0    0    2G  0 raid1
+│   └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
+└─sdb2                 8:18   0  511M  0 part
+  └─md1                9:1    0 1018M  0 raid0
+sdc                    8:32   0  2.5G  0 disk
+├─sdc1                 8:33   0    2G  0 part
+│ └─md0                9:0    0    2G  0 raid1
+│   └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
+└─sdc2                 8:34   0  511M  0 part
+  └─md1                9:1    0 1018M  0 raid0
+Логический том vg02 переехал с одного рэйда на другой.
 ```
