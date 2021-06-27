@@ -257,5 +257,12 @@ dmesg|grep -i raid
 Диск в ауте
 ```
 ```
-
+19. Проверяю целостность файла
+root@vagrant:/tmp/new# gzip -t /tmp/new/test.gz
+root@vagrant:/tmp/new# echo $?
+0
+Всё в порядке
+```
+```
+20. Выполнено.
 ```
