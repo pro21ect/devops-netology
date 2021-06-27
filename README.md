@@ -86,3 +86,6 @@ sudo pvdisplay
   Allocated PE          0
   PV UUID               z8UVPQ-6Z22-XVYa-ZR0x-E6Cz-Zl2I-YTA2mk
 ```
+```
+9. 
+```
