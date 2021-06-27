@@ -250,4 +250,12 @@ md0 : active raid1 sdc1[1] sdb1[0](F)
 Пометка фэйл присутствует      
 ```
 ```
-```    
+18. Для проверки Raid использую
+dmesg|grep -i raid
+Одна из строк гласит
+[110330.695420] md/raid1:md0: Disk failure on sdb1, disabling device.
+Диск в ауте
+```
+```
+
+```
