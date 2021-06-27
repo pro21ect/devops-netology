@@ -205,5 +205,13 @@ sdc                    8:32   0  2.5G  0 disk
     └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
 ```
 ```
-
+15. Для тестирования архивирую созданный файл
+gzip /tmp/new/test
+Тестирую
+root@vagrant:/# gzip -t /tmp/new/test.gz
+root@vagrant:/# echo $?
+0
+```
+```
+16. 
 ```
