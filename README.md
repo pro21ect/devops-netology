@@ -157,5 +157,9 @@ lvdisplay
   Block device           253:2
 ```
 ```
-11. 
+11. Создаю ФС
+mkfs.ext4 /dev/vg02/lv_test1
+```
+```
+
 ```
