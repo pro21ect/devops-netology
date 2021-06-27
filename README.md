@@ -159,7 +159,29 @@ lvdisplay
 ```
 11. Создаю ФС
 mkfs.ext4 /dev/vg02/lv_test1
-```
-```
+Вижу
+mke2fs 1.45.5 (07-Jan-2020)
+Creating filesystem with 25600 4k blocks and 25600 inodes
 
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (1024 blocks): done
+Writing superblocks and filesystem accounting information: done
+```
+```
+12. Создаю директорию /tmp/new и монтирую созданный логический том
+mount /dev/vg02/lv_test1 /tmp/new
+```
+```
+13. Создаю тестовый файл test и копирую в логический том.
+copy test /tmp/new
+Проверяю
+ll /tmp/new
+drwxr-xr-x  3 root root  4096 Jun 27 11:04 ./
+drwxrwxrwt 10 root root  4096 Jun 27 10:57 ../
+drwx------  2 root root 16384 Jun 27 09:54 lost+found/
+-rw-r--r--  1 root root     4 Jun 27 11:04 test
+```
+```
+14. 
 ```
