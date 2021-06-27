@@ -87,5 +87,28 @@ sudo pvdisplay
   PV UUID               z8UVPQ-6Z22-XVYa-ZR0x-E6Cz-Zl2I-YTA2mk
 ```
 ```
-9. 
+9. Создаю VG
+vgcreate vg01 /dev/md0 /dev/md1
+Проверяю
+vgdisplay
+--- Volume group ---
+  VG Name               vg01
+  System ID
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               <2.99 GiB
+  PE Size               4.00 MiB
+  Total PE              765
+  Alloc PE / Size       0 / 0
+  Free  PE / Size       765 / <2.99 GiB
+  VG UUID               bT3bJz-BTsM-jvHE-rpBD-CawJ-MqbT-MZFG1A
 ```
