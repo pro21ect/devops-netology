@@ -65,13 +65,25 @@ Syslog начинал с UDP, в более свежих его реализац
 ```
 ```
 12. Ответ:
-sudo ss  state listening -t -p
+ss state listening -t -p -s
+Total: 131
+TCP:   6 (estab 1, closed 0, orphaned 0, timewait 0)
+
+Transport Total     IP        IPv6
+RAW       1         0         1
+UDP       4         3         1
+TCP       6         4         2
+INET      11        7         4
+FRAG      0         0         0
+
 Recv-Q  Send-Q   Local Address:Port       Peer Address:Port  Process                                                    
 0       4096           0.0.0.0:sunrpc          0.0.0.0:*      users:(("rpcbind",pid=592,fd=4),("systemd",pid=1,fd=35))  
 0       4096     127.0.0.53%lo:domain          0.0.0.0:*      users:(("systemd-resolve",pid=593,fd=13))                 
 0       128            0.0.0.0:ssh             0.0.0.0:*      users:(("sshd",pid=1169,fd=3))                            
 0       4096              [::]:sunrpc             [::]:*      users:(("rpcbind",pid=592,fd=6),("systemd",pid=1,fd=37))  
 0       128               [::]:ssh                [::]:*      users:(("sshd",pid=1169,fd=4))
+Как видно 6 TCP - 4 IPv4 и 2 IPv6
+Процессы: systemd,sshd                 
 ```
 ```
 13. 
