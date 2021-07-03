@@ -87,6 +87,32 @@ Recv-Q  Send-Q   Local Address:Port       Peer Address:Port  Process
 ```
 ```
 13. 
+1. tcpdump -A -c 1
+где ключ -A и отвечает за вывод в тексте
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+15:51:52.683395 IP vagrant.ssh > _gateway.57392: Flags [P.], seq 3426544232:3426544332, ack 34123123, win 62780, length 100
+E...~.@.@...
+...
+......0.<.h...sP..<....Q.+*..6..%....CIe".{.W.........m....
+..5GH.*..+_-.~<r'k.....\......0..e>Q...-I.|?[.U...W.nO.U.).r.lZ
+1 packet captured
+34 packets received by filter
+1 packet dropped by kernel
+2. sudo tcpdump -x -c 1
+-x - позволит увидеть данные в HEX формате
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+15:58:25.884633 IP vagrant.ssh > _gateway.57392: Flags [P.], seq 3426545316:3426545352, ack 34123203, win 62780, length 36
+        0x0000:  4510 004c 7ecb 4000 4006 a3c0 0a00 020f
+        0x0010:  0a00 0202 0016 e030 cc3c eea4 0208 adc3
+        0x0020:  5018 f53c 184f 0000 f65f ff5c c60d 7dca
+        0x0030:  c7b0 a0b0 b967 ad76 74ae 59d1 f1fd 81cd
+        0x0040:  ebfa fc21 74d4 afa4 e1c6 1d81
+1 packet captured
+50 packets received by filter
+18 packets dropped by kernel
+
 ```
 ```
 14. 
