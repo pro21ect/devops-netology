@@ -67,36 +67,10 @@ Syslog начинал с UDP, в более свежих его реализац
 12. 
 ```
 ```
-13. Создаю тестовый файл test и копирую в логический том.
-copy test /tmp/new
-Проверяю
-ll /tmp/new
-drwxr-xr-x  3 root root  4096 Jun 27 11:04 ./
-drwxrwxrwt 10 root root  4096 Jun 27 10:57 ../
-drwx------  2 root root 16384 Jun 27 09:54 lost+found/
--rw-r--r--  1 root root     4 Jun 27 11:04 test
+13. 
 ```
 ```
-14. Вывод lsblk
-NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
-sda                    8:0    0   64G  0 disk
-├─sda1                 8:1    0  512M  0 part  /boot/efi
-├─sda2                 8:2    0    1K  0 part
-└─sda5                 8:5    0 63.5G  0 part
-  ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
-  └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
-sdb                    8:16   0  2.5G  0 disk
-├─sdb1                 8:17   0    2G  0 part
-│ └─md0                9:0    0    2G  0 raid1
-└─sdb2                 8:18   0  511M  0 part
-  └─md1                9:1    0 1018M  0 raid0
-    └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
-sdc                    8:32   0  2.5G  0 disk
-├─sdc1                 8:33   0    2G  0 part
-│ └─md0                9:0    0    2G  0 raid1
-└─sdc2                 8:34   0  511M  0 part
-  └─md1                9:1    0 1018M  0 raid0
-    └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
+14. 
 ```
 ```
 15. Для тестирования архивирую созданный файл
