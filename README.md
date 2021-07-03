@@ -24,7 +24,14 @@ time-wait - присуще tcp, такак это состояние когда 
 unconn - состояние аналогичное tcp listenning, т.е порт открыт, но в силу особенностей протокола, будет отображаться как состояние не известно. Подключения на такой порт будут проходить.
 ```
 ```
-7. 
+7. Схема будет выглядеть так:
+                   Client                 Server 
+                 ESTABLESHED             ESTABLESHED
+1.  FIN WAIT 1 (active close)   FIN->   CLOSE WAIT (passive close)
+2.  FIN WAIT 2                  <-ACK   CLOSE WAIT (passive close)
+3.  TIME WAIT                   <-FIN   LAST ACK
+4.  TIME WAIT                   ACK->   CLOSED
+                  CLOSED                CLOSED
 
 ```
 ```
