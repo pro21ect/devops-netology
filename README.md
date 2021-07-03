@@ -64,7 +64,14 @@ Syslog начинал с UDP, в более свежих его реализац
 
 ```
 ```
-12. 
+12. Ответ:
+sudo ss  state listening -t -p
+Recv-Q  Send-Q   Local Address:Port       Peer Address:Port  Process                                                    
+0       4096           0.0.0.0:sunrpc          0.0.0.0:*      users:(("rpcbind",pid=592,fd=4),("systemd",pid=1,fd=35))  
+0       4096     127.0.0.53%lo:domain          0.0.0.0:*      users:(("systemd-resolve",pid=593,fd=13))                 
+0       128            0.0.0.0:ssh             0.0.0.0:*      users:(("sshd",pid=1169,fd=3))                            
+0       4096              [::]:sunrpc             [::]:*      users:(("rpcbind",pid=592,fd=6),("systemd",pid=1,fd=37))  
+0       128               [::]:ssh                [::]:*      users:(("sshd",pid=1169,fd=4))
 ```
 ```
 13. 
