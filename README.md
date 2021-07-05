@@ -115,67 +115,12 @@ listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ```
 ```
-14. 
-```
-```
-15. Для тестирования архивирую созданный файл
-gzip /tmp/new/test
-Тестирую
-root@vagrant:/# gzip -t /tmp/new/test.gz
-root@vagrant:/# echo $?
-0
-```
-```
-16. Для переонса необходимо чтоб физические тома были в одной одной логической группе
-Поэтому вначале удаляю логическу группу томов vg01
-vgremove vg01
-Вижу
-Volume group "vg01" successfully removed
-Затем добавляю том в vg02
-vgextend vg02 /dev/md0
-Вижу
-Volume group "vg02" successfully extended
-Затем перемещаю физические тома
-pvmove /dev/md1 /dev/md0
-Результат
-sdb                    8:16   0  2.5G  0 disk
-├─sdb1                 8:17   0    2G  0 part
-│ └─md0                9:0    0    2G  0 raid1
-│   └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
-└─sdb2                 8:18   0  511M  0 part
-  └─md1                9:1    0 1018M  0 raid0
-sdc                    8:32   0  2.5G  0 disk
-├─sdc1                 8:33   0    2G  0 part
-│ └─md0                9:0    0    2G  0 raid1
-│   └─vg02-lv_test1  253:2    0  100M  0 lvm   /tmp/new
-└─sdc2                 8:34   0  511M  0 part
-  └─md1                9:1    0 1018M  0 raid0
-Логический том vg02 переехал с одного рэйда на другой.
-```
-```
-17. Помечаю один из дисков в рэйде 1 неисправным
-mdadm --fail /dev/md0 /dev/sdb1
-Проверяю
-cat /proc/mdctat
-Вижу
-md0 : active raid1 sdc1[1] sdb1[0](F)
-      2094080 blocks super 1.2 [2/1] [_U]
-Пометка фэйл присутствует      
-```
-```
-18. Для проверки Raid использую
-dmesg|grep -i raid
-Одна из строк гласит
-[110330.695420] md/raid1:md0: Disk failure on sdb1, disabling device.
-Диск в ауте
-```
-```
-19. Проверяю целостность файла
-root@vagrant:/tmp/new# gzip -t /tmp/new/test.gz
-root@vagrant:/tmp/new# echo $?
-0
-Всё в порядке
-```
-```
-20. Выполнено.
+14. Флаг IP будет отображаться в таком виде
+ Flags: 0x40, Don't fragment
+        0... .... = Reserved bit: Not set   - всегда 0, т.к. зарезервировано
+        .1.. .... = Don't fragment: Set   - если 1 то не фрагментирован, при 0 наоборот
+        ..0. .... = More fragments: Not set  - 0 означает что фрагмент последний, 1 - есть ещё фрагмент
+
+Ethernet будет называться Ethernet II
+Organizationally Unique Identifier можно увидеть например в таком виде  -  12:35:02 (52:54:00:12:35:02)
 ```
