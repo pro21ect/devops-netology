@@ -1,129 +1,99 @@
 ```
-1. Предположу что это связано с особенностью режимов DR или TUN. В отличии от режима NAT пакеты в данном режиме от клиента к серверу
- летят минуюя ipvs. У ipvs есть собственная таблица тайм-аутов, в которой согласно таймингу есть время ожидания ответа от клиента.
-Отсюда вывод ipvsadm -Ln будут висеть ещё некоторое время.
+1. Добавляю необходимую строку в vagrantfile
+Далее ставлю Vault:
+root@vagrant:~$ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+root@vagrant:~$ sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+root@vagrant:~$ sudo apt-get update && sudo apt-get install vault
+Всё установлено
 ```
 ```
-2.  Создаю 5 машин:
-boxes = {
-    "client" => "10",
-    "bal1" => "21",
-    "bal2" => "22",
-    "real1" => "31",
-    "real2" => "32",
-}
-
-Vagrant.configure("2") do |config|
-    config.vm.network "private_network", virtualbox__intnet: true, auto_config: false
-    config.vm.box = "bento/ubuntu-20.04"
-
-    boxes.each do |hostname, addr|
-        config.vm.define hostname do |node|
-            node.vm.hostname = hostname
-
-            node.vm.provider "virtualbox" do |v|
-                v.name = hostname + "(Vagrant)"
-            end
-
-            node.vm.provision "shell" do |s|
-                s.inline = "hostname $1;" \
-                "ip addr add $2 dev eth1;" \
-                "ip link set dev eth1 up;" \
-                "if [[ $1 == *\"client\"* ]]; then apt -y install arping; fi;" \
-                "if [[ $1 == *\"bal\"* ]]; then apt -y install keepalived ipvsadm; fi;" \
-                "if [[ $1 == *\"real\"* ]]; then apt -y install nginx; fi;"
-                s.args = [hostname, "172.28.128.#{addr}/24"]
-            end
-        end
-    end
-end
-Из них 1 клиент, два баланстровщика и 2 реала
-
-б) Далее конфиг /etc/keepalived/keepalived.conf для bal1
-vrrp_instance vrrp_1 {
-    state MASTER
-    interface eth1
-    virtual_router_id 200
-    priority 100
-    advert_int 1
-
-    authentication {
-        auth_type PASS
-        auth_pass buka17
-    }
-
-    virtual_ipaddress {
-        172.28.128.200/24 dev eth1 label eth1:200
-    }
-}
-
-virtual_server 172.28.128.200 80 {
-    delay_loop 10
-    lb_algo rr
-    lb_kind DR
-    protocol TCP
-
-    real_server 172.28.128.31 80 {
-        weight 1
-        TCP_CHECK {
-            connect_timeout 10
-            connect_port    80
-        }
-    }
-
-    real_server 172.28.128.32 80 {
-        weight 1
-        TCP_CHECK {
-            connect_timeout 10
-            connect_port    80
-        }
-    }
-в) Затем конфиг /etc/keepalived/keepalived.conf для bal2   
-В нём изменяю параметры относительно представленного выше
-state BACKUP
-priority 50
-
-г) Настройки на реалах для DR:
-sudo iptables -t nat -A PREROUTING -p TCP -d 172.28.128.0/24 --dport 80 -j REDIRECT
-затем
-sudo sysctl -w net.ipv4.ip_forward=1
-
-д) На балансировщиках выполняю
-sudo systemctl start keepalived
-
-е) Проверяю на клиенте:
-for i in {1..50}; do curl -I -s http://172.28.128.200>/dev/null; done
-На bal1 :
-sudo ipvsadm -Ln --stats
-IP Virtual Server version 1.2.1 (size=4096)
-Prot LocalAddress:Port Scheduler Flags
-  -> RemoteAddress:Port           Conns InPkts OutPkts InBytes Outbytes
-TCP  172.28.128.200:80               50    300       0   19950        0
-  -> 172.28.128.31:80                25    150       0    9975        0
-  -> 172.28.128.32:80                25    150       0    9975        0
-Соединения видны
-
-Затем останавливаю bal1
-sudo systemctl stop keepalived
-
-На клиенте ещё раз
-for i in {1..50}; do curl -I -s http://172.28.128.200>/dev/null; done
-
-Проверяю соединения на 2-ом балансировщике:
-sudo ipvsadm -Ln --stats
-IP Virtual Server version 1.2.1 (size=4096)
-Prot LocalAddress:Port Scheduler Flags
-  -> RemoteAddress:Port           Conns InPkts OutPkts InBytes Outbytes
-TCP  172.28.128.200:80               50    300       0   19950        0
-  -> 172.28.128.31:80                25    150       0    9975        0
-  -> 172.28.128.32:80                25    150       0    9975        0
-
-
+2.  Заппускаю сервер в dev режиме
+ vault server -dev -dev-listen-address="0.0.0.0:8200" &
+ Проверяю запуск через браузер с хостовой машины на адрес localhost:8200
+ 
 ```
 ```
-3.  Из того что я понял из условий задачи я бы увеличил кол-во балансировщиков в 2-ое на каждом их хостов.
-Потеря любого из них не привела бы к полной утилицации сети, т.к. оставшиеся 4 вполне справляются.
-Итого 6 балансировщиков на 3-х хостах с 6 VIP
+3. Создаю Root CA
+root@vagrant:/home/vagrant# vault secrets enable pki
+2021-08-18T17:52:00.510Z [INFO]  core: successful mount: namespace="" path=pki/ type=pki
+Success! Enabled the pki secrets engine at: pki/
+root@vagrant:/home/vagrant# vault secrets tune -max-lease-ttl=8760h pki
+2021-08-18T17:54:39.863Z [INFO]  core: mount tuning of leases successful: path=pki/
+Success! Tuned the secrets engine at: pki/
+root@vagrant:/home/vagrant# vault write -field=certificate pki/root/generate/internal common_name="example.com" ttl=876
+00h > CA_cert.crt
+root@vagrant:/home/vagrant# vault write pki/config/urls issuing_certificates="$VAULT_ADDR/v1/pki/ca" crl_distribution_p
+oints="$VAULT_ADDR/v1/pki/crl"
+Success! Data written to: pki/config/urls
 
+Создаю Intermediate CA
+root@vagrant:~$ vault secrets enable -path=pki_int pki
+2021-08-18T17:58:00.326Z [INFO]  core: successful mount: namespace= path=pki_int/ type=pki
+Success! Enabled the pki secrets engine at: pki_int/
+root@vagrant:~$ vault secrets tune -max-lease-ttl=43800h pki_int
+2021-08-18T17:59:10.664Z [INFO]  core: mount tuning of leases successful: path=pki_int/
+Success! Tuned the secrets engine at: pki_int/
+root@vagrant:~$ sudo apt install jq
+root@vagrant:~$ vault write -format=json pki_int/intermediate/generate/internal common_name="example.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
+root@vagrant:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr format=pem_bundle ttl="43800h" | jq -r '.data.certificate' > intermediate.cert.pem
+root@vagrant:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+Success! Data written to: pki_int/intermediate/set-signed
+```
+```
+4. Подписываю Intermediate CA csr на сертификат для тестового домена netology.example.com
+root@vagrant:/home/vagrant# vault write pki_int/roles/example-dot-com allowed_domains="example.com" allow_subdomains=tr
+ue max_ttl="7200h"
+Success! Data written to: pki_int/roles/example-dot-com
+root@vagrant:/home/vagrant# vault write pki_int/issue/example-dot-com common_name="netology.example.com" ttl="2400h"
+Получаю:
+ca_chain            [-----BEGIN CERTIFICATE-----
+certificate         -----BEGIN CERTIFICATE-----
+issuing_ca          -----BEGIN CERTIFICATE-----
+private_key         -----BEGIN RSA PRIVATE KEY-----
+
+Далее сохраняю полученные сертификаты в файлы.
+```
+```
+5. Устанавливаю nginx
+apt-get install nginx
+sudo vim /etc/nginx/sites-enabled/default
+Раскоменчиваю и добавляю:
+listen 443 ssl default_server;
+listen [::]:443 ssl default_server;
+ssl_certificate /home/vagrant/netology.example.com.crt;
+ssl_certificate_key /home/vagrant/netology.example.com.key;
+Затем
+nginx -t
+Получаю
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+Перезапускаю сервис
+root@vagrant:~$ systemctl reload nginx
+```
+```
+6. Правлю /etc/hosts
+vim /etc/hosts
+Добавляю
+127.0.0.1 localhost netology.example.com
+
+root@vagrant:~# ln -s /home/vagrant/intermediate.ca.cert.crt /usr/share/ca-certificates/mozilla/intermediate.ca.cert.crt
+root@vagrant:~# echo mozilla/intermediate.ca.cert.crt >> /etc/ca-certificates.conf
+root@vagrant:~# update-ca-certificates
+Updating certificates in /etc/ssl/certs...
+1 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Проверяю:
+root@vagrant:~# curl -I -s https://netology.example.com |head -1
+HTTP/1.1 200 OK
+```
+```
+7. Протокол ACME применяется для организации взаимодействия удостоверяющего центра и web-сервера,
+например, для автоматизации получения и обслуживания сертификатов. Запросы передаются в формате JSON поверх HTTPS.
+Проект разработан некоммерческим удостоверяющим центром Let’s Encrypt, контролируемым сообществом и предоставляющим
+сертификаты безвозмездно всем желающим.
+
+К счастью домена без сертификата SSL у  меня нет. По некоторым соображениям компания не использует бесплатные сертификаты  
+Однако мне доводилось ранее их устанавливать и сложностей не возникало
 ```
 
