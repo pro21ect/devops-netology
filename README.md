@@ -1,66 +1,47 @@
 ```
-1.
-- Будет ошибка, т.к. разные типы переменных
-- c=str(a)+b
-- c=a+int(b)
+1. Ошибка отсутствие кавычек в 9-ой строке
+{ "info" : "Sample JSON output from our service\t",
+    "elements" :[
+        { "name" : "first",
+        "type" : "server",
+        "ip" : 7175 
+        },
+        { "name" : "second",
+        "type" : "proxy",
+        "ip” : “71.78.22.43”
+        }
+    ]
+}
 ```
 ```
 2.  Мой вариант допиливания:
 #!/usr/bin/env python3
 
-import os
-path='~/devops-netology'
-
-bash = ["cd " +path, "git status"]
-result_os = os.popen(' && '.join(bash)).read()
-# Убираю строку is_change = False
-for result in result_os.split('\n'):
-    if result.find('modified') != -1:
-        prep = result.replace('\tmodified:   ', '')
-        sep='/'
-        out=path+sep+prep
-        print(out)
-#  Убираю строку  break
-```
-```
-3. Решение:
-!/usr/bin/env python3
-
-import os
-import sys
-
-#Проверяем параметр входа, если такого нет испозью  текущую папку
-path = os.getcwd()
-if len(sys.argv)>=2:
-  path = sys.argv[1]
-
-bash_command = ["cd " +path, "git status"]
-result_os = os.popen(' && '.join(bash_command)).read()
-for result in result_os.split('\n'):
-    if result.find('modified') != -1:
-        prep = result.replace('\tmodified:   ', '')
-        sep='/'
-        out=path+sep+prep
-        print(out)
-```
-```
-4.
-#!/usr/bin/env python3
-
 import time
 import sys
+import json
+import yaml
 import socket
 
-site = {"drive.google.com":"", "mail.google.com":"", "google.com":""}
+site = {"drive.google.com": "", "mail.google.com": "", "google.com": ""}
 while True:
+    exp_site = []
     for url, ip in site.items():
-        new_ip = socket.gethostbyname(url)
-        if ip != "" and ip != new_ip:
-            sys.stdout.write("[ERROR] " + url + " IP mismatch: " + ip + " " + new_ip + "\n")
+        ip_new = socket.gethostbyname(url)
+        if ip != "" and ip != ip_new:
+            sys.stdout.write("[ERROR] " + url + " IP mismatch: " + ip + " " + ip_new + "\n")
         else:
-            sys.stdout.write(url + "  " + new_ip + "\n")
-        site[url] = new_ip
-    time.sleep(30) 
-``` 
+            sys.stdout.write(url + "  " + ip_new + "\n")
+        site[url] = ip_new
+        exp_site.append({url: ip_new})
+    with open("ip_list.json", "w") as json_file:
+        json_file.write(json.dumps(export_array, indent=2))
+    with open("ip_list.yaml", "w") as yaml_file:
+        yaml_file.write(yaml.dump(export_array, explicit_start=True, explicit_end=True))
+    time.sleep(60)
+
+```
+```
+
 
 
