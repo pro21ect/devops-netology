@@ -1,51 +1,214 @@
-1. Команда cd встроенная. Объясняется просто type cd. Результат cd is a shell builtin
+```
+1. Ответ:
+docker pull postgres:1234
+docker volume create vol1
+docker volume create vol2
+docker run --rm --name pro21ect -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e -ti -p 5432:5432 -v vol1:/var/lib/postgresql/data -v vol2:/var/lib/postgresql/ postgres:1234
 
-2. Какая альтернатива без pipe команде grep <some_string> <some_file> | wc -l - команда подсчитывает число строк контекста
-- альтернатива grep -c <some_string> <some_file>
+```
+``` 
+2.Ответ:
+test_db=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ test_db   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+(4 rows)
 
-3. Выясняется командой например pstree -Apn. PID1 - процесс systemd. Система инициализации.
+test_db=# \du
+                                       List of roles
+    Role name     |                         Attributes                         | Member of 
+------------------+------------------------------------------------------------+-----------
+ postgres         | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ test-admin-user  | Superuser, No inheritance                                  | {}
+ test-simple-user | No inheritance                                             | {}
 
-4. Как будет выглядеть команда, которая перенаправит вывод stderr ls на другую сессию терминала?
-- ls -lha 2>/dev/pts/1 
+test_db=# \dt
+          List of relations
+ Schema |  Name   | Type  |  Owner   
+--------+---------+-------+----------
+ public | clients | table | postgres
+ public | orders  | table | postgres
+(2 rows)
 
-5. Получится ли одновременно передать команде файл на stdin и вывести ее stdout в другой файл? Приведите работающий пример.
-- Да возможно.  
-# Пример ls -lha <test >test1
+test_db=# select * from information_schema.table_privileges where grantee in ('test-admin-user','test-simple-user');
+ grantor  |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarchy 
+----------+------------------+---------------+--------------+------------+----------------+--------------+----------------
+ postgres | test-simple-user | test_db       | public       | clients    | INSERT         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | clients    | SELECT         | NO           | YES
+ postgres | test-simple-user | test_db       | public       | clients    | UPDATE         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | clients    | DELETE         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | INSERT         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | SELECT         | NO           | YES
+ postgres | test-simple-user | test_db       | public       | orders     | UPDATE         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | DELETE         | NO           | NO
+(8 rows)
 
-6. Получится ли вывести находясь в графическом режиме данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
-- cat /dev/tty > /dev/pts/1
+test_db=# 
 
-7. Выполните команду bash 5>&1. К чему она приведет? Что будет, если вы выполните echo netology > /proc/$$/fd/5? Почему так происходит?
-- bash 5>&1  Создаёт файловый дескриптор 5, перенаправляет его в stdout. Командой lsof -p $$ созданный десриптор можно посмотреть
-- echo netology > /proc/$$/fd/5 - выводит netology, т.к дескриптор перенаправляется в stdout.
+```
+```
+3.Ответ:
+test_db=# insert into orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
+INSERT 0 5
 
-8. Получится ли в качестве входного потока для pipe использовать только stderr команды, не потеряв при этом отображение stdout на pty? - Напоминаем: по умолчанию через pipe передается только stdout команды слева от | на stdin команды справа. Это можно сделать, поменяв стандартные - потоки местами через промежуточный новый дескриптор, который вы научились создавать в предыдущем вопросе.
-- bash 7>&1 1>>&2 2>>>&7 - данная команда меняет потоки местами с использованием промежуточного дескриптора.
+Проверяю:
+test_db=# select count (*) from orders;
+ count 
+-------
+     5
+(1 row)
 
-9. Что выведет команда cat /proc/$$/environ? Как еще можно получить аналогичный по содержанию вывод?
-- Покажет переменные окружения доступные для процесса $$.
-- Альтернатива например xargs --null --max-args=1 echo < /proc/<pid>/environ
+test_db=# insert into clients VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
+INSERT 0 5
 
-10. Используя man, опишите что доступно по адресам /proc/<PID>/cmdline, /proc/<PID>/exe
-- /proc/<PID>/cmdline - содержит аргументы командной стоки, переданные при запуске процесса( кроме зомби). Аргументы командной
-- строки отображаются в этом файле в виде набора строк, разделенных нулевыми байтами ('\0'), с дополнительным нулевым байтом
-- после последней строки.
-- /proc/$pid/exe - является символьной ссылкой на исполняемый бинарный файл. Пройдя по ссылке можно открыть его копию.В многопоточном процессе - содержимое этой символическойссылки недоступно, если основной поток уже завершен.
-  
-11. Узнайте, какую наиболее старшую версию набора инструкций SSE поддерживает ваш процессор с помощью /proc/cpuinfo
-- cat /proc/cpuinfo параметры flags sse4.2
+Проверяю:
+test_db=# select count (*) from clients;
+ count 
+-------
+     5
+(1 row)
 
-12. При открытии нового окна терминала и vagrant ssh создается новая сессия и выделяется pty. Это можно подтвердить командой tty, - которая упоминалась в лекции 3.2. Однако:
-- vagrant@netology1:~$ ssh localhost 'tty'
-- not a tty
-- проблема возникает из-за особенностей работы vagrant c ssh
-- альтернатива добавить строку в vagrantfile config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+```
+```
+4. Ответ:
+test_db=# update  clients set booking = 3 where id = 1;
+UPDATE 1
+test_db=# update  clients set booking = 4 where id = 2;
+UPDATE 1
+test_db=# update  clients set booking = 5 where id = 3;
+UPDATE 1
 
-13. Бывает, что есть необходимость переместить запущенный процесс из одной сессии в другую. Попробуйте сделать это, - воспользовавшись reptyr. Например, так можно перенести в screen процесс, который вы запустили по ошибке в обычной SSH-сессии.
-- screen -S <процесс> - команда захватывает процесс и он будет продожаться при отключении сессии
-- reptyr <PID of running process to attach> - перехватывает процесс в запущенный сеанс
+test_db=# select * from clients;
+ id |       lastname       | country | booking 
+----+----------------------+---------+---------
+  4 | Ронни Джеймс Дио     | Russia  |        
+  5 | Ritchie Blackmore    | Russia  |        
+  1 | Иванов Иван Иванович | USA     |       3
+  2 | Петров Петр Петрович | Canada  |       4
+  3 | Иоганн Себастьян Бах | Japan   |       5
+(5 rows)
 
-14.sudo echo string > /root/new_file не даст выполнить перенаправление под обычным пользователем, так как перенаправлением - занимается процесс shell'а, который запущен без sudo под вашим пользователем. Для решения данной проблемы можно использовать - конструкцию echo string | sudo tee /root/new_file. Узнайте что делает команда tee и почему в отличие от sudo echo команда с sudo - tee будет работать.
-- sudo echo string > /root/new_file - команда не будет работать потому что ">" - перенаправление выполняется с правами обычного пользователя
-- echo string | sudo tee /root/new_file - такой формат передаёт рутовые права для записи.
+test_db=# select * from clients where booking is not NULL;
+ id |       lastname       | country | booking 
+----+----------------------+---------+---------
+  1 | Иванов Иван Иванович | USA     |       3
+  2 | Петров Петр Петрович | Canada  |       4
+  3 | Иоганн Себастьян Бах | Japan   |       5
+(3 rows)
+ 
+```
+```
+5. Приведу один из самый информативных, на мой взгляд запросов с использованием директивы EXPLAIN
+test_db=# select * from clients where booking is not NULL;
+ id |       lastname       | country | booking 
+----+----------------------+---------+---------
+  1 | Иванов Иван Иванович | USA     |       3
+  2 | Петров Петр Петрович | Canada  |       4
+  3 | Иоганн Себастьян Бах | Japan   |       5
+(3 rows)
 
+test_db=# explain select * from clients where booking is not NULL;
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
+   Filter: (booking IS NOT NULL)
+(2 rows)
+
+Выше можно увидеть число обработанных записей, стоимость и время на операцию
+
+```
+```
+6. Ответ:
+Для начала сделаю дамп на vol2:
+root@57b7855b4e87:/# pg_dump -U postgres test_db > /var/lib/postgresql/test_db_dump.sql
+
+root@57b7855b4e87:/# ls -la /var/lib/postgresql/
+total 16
+drwxr-xr-x  3 postgres postgres 4096 Sep 23 19:03 .
+drwxr-xr-x  1 root     root     4096 Sep  3 12:56 ..
+drwx------ 19 postgres postgres 4096 Sep 23 16:59 data
+-rw-r--r--  1 root     root     2541 Sep 23 19:03 test_db_dump.sql
+
+Затем поднимаю ещё один контейнер для восстановления с тома на котором дамп.
+trohi@Ptrohi_1 ~ % docker run --rm --name pro21ect_1 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -ti -p 5432:5432 -v vol2:/var/lib/postgresql/ postgres:1234
+
+Восстанавливаю:
+trohi@Ptrohi_1 ~ % docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+1bcde4c5ed12   postgres:1234   "docker-entrypoint.s…"   11 seconds ago   Up 11 seconds   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   pro21ect_1
+trohi@Ptrohi_1 ~ % docker exec -ti 1bcde4c5ed12 bash
+root@1bcde4c5ed12:/# ls -la /var/lib/postgresql/
+total 16
+drwxr-xr-x  3 postgres postgres 4096 Sep 23 19:03 .
+drwxr-xr-x  1 root     root     4096 Sep  3 12:56 ..
+drwx------ 19 postgres postgres 4096 Sep 23 19:06 data
+-rw-r--r--  1 root     root     2541 Sep 23 19:03 test_db_dump.sql
+root@1bcde4c5ed12:/# psql -U postgres -d test_db < /var/lib/postgresql/test_db_dump.sql 
+psql: error: FATAL:  database "test_db" does not exist
+root@1bcde4c5ed12:/# psql -U postgres
+psql (12.8 (Debian 12.8-1.pgdg100+1))
+Type "help" for help.
+
+postgres-# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(3 rows)
+postgres=# create database test_db
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ test_db   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+(4 rows)
+
+postgres=# exit
+root@1bcde4c5ed12:/# psql -U postgres -d test_db < /var/lib/postgresql/test_db_dump.sql 
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+COPY 5
+COPY 5
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+GRANT
+GRANT
+
+
+ 
+ 
+```
