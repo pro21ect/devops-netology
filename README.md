@@ -1,4 +1,3 @@
-```
 1. Ответ:
 docker pull postgres:1234
 docker volume create vol1
