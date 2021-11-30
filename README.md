@@ -10,14 +10,42 @@ mysql> create database test_db;
 mysql> use test_db;
 mysql> source test_dump.sql
 \s
-show tables;
+show tables;mysql> show tables;
++-------------------+
+| Tables_in_test_db |
++-------------------+
+| orders            |
++-------------------+
+
 select * from orders where price > 300;
++----------+
+| COUNT(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.00 sec)
 ```
 ``` 
 2.Ответ:
 create user test identified with mysql_native_password by 'test-pass' with max_connections_per_hour 100 password expire interval 180 day failed_login_attempts 3 attribute '{"fname": "James", "lname": "Pretty"}';
 grant select on test_db.* to test;
 select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user='test';
+
+SHOW GRANTS FOR 'test';
++-------------------------------------------+
+| Grants for test@%                         |
++-------------------------------------------+
+| GRANT USAGE ON *.* TO `test`@`%`          |
+| GRANT SELECT ON `test_db`.* TO `test`@`%` |
++-------------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE user='test';
++------+------+--------------------------------------+
+| USER | HOST | ATTRIBUTE                            |
++------+------+--------------------------------------+
+| test | %    | {"Name": "James", "lname": "Pretty"} |
++------+------+--------------------------------------+
 ```
 ```
 3.Ответ:
