@@ -85,9 +85,12 @@ test_database=# \dt
 pg_dump test_database > /home/pro21/posgres/test_database_backup.sql
 
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца title для таблиц test_database?
-test_database=# CREATE UNIQUE INDEX CONCURRENTLY ix_title1 ON orders_1 (title);
-CREATE INDEX
-test_database=# CREATE UNIQUE INDEX CONCURRENTLY ix_title2 ON orders_2 (title);
-CREATE INDEX
+Использую UNIQUE к нужному столбцу
+CREATE TABLE public.orders (
+    id integer NOT NULL,
+    title character varying(80) UNIQUE NOT NULL,
+    price integer DEFAULT 0
+)
+PARTITION BY RANGE (price);
  
 ```
