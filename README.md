@@ -53,7 +53,5 @@ work_mem
 shared_buffers
 effective_cache_size
 maintenance_work_mem
-
-
  
 ```
